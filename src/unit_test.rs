@@ -6,16 +6,43 @@ use piston_window::*;
 use vecmath::vec2_sub;
 //use vecmath::*;
 
+const RED:[f32;4] = [1.0, 0.0, 0.0, 1.0];
+const GREEN:[f32;4] = [0.0, 1.0, 0.0, 1.0];
+const BLUE:[f32;4] = [0.0, 0.0, 1.0, 1.0];
+const COLOR_IRON:[f32;4] = [0.1, 0.1, 0.1, 1.0];
+const COLOR_FLESH:[f32;4] = [0.7, 0.0, 0.0, 1.0];
+const COLOR_WOOD:[f32;4] = [0.3, 0.0, 0.0, 1.0];
+const COLOR_GROUND:[f32;4] = [0.5, 0.5, 0.5, 1.5];
+
+
+enum Tiles {
+    Iron,
+    Flesh,
+    Wood,
+    Ground
+}
+impl Tiles{
+    fn get_color(&self)->[f32;4]{
+        match self {
+            Tiles::Iron=> COLOR_IRON,
+            Tiles::Flesh => COLOR_FLESH,
+            Tiles::Wood => COLOR_WOOD,
+            Tiles::Ground=> COLOR_GROUND,
+        }
+    }
+}
+
+
 fn main() {
     let opengl = OpenGL::V3_2;
     let (width, height) = (400, 400);
+    let grid_size = 50;
     let mut window: PistonWindow =
         WindowSettings::new("Through the Breach", (width, height))
             .graphics_api(opengl)
             .build()
             .unwrap();
 
-    const GREEN:[f32;4] = [0.0, 1.0, 0.0, 1.0];
     let mut is_pressed = false;
 
     let mut cursor: Option<[f64; 2]> = None;
