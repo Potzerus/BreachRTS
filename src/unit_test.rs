@@ -33,6 +33,10 @@ impl Tiles {
     }
 }
 
+struct Unit {
+
+}
+
 
 fn main() {
     let opengl = OpenGL::V3_2;
@@ -73,15 +77,16 @@ fn main() {
         if let Some(_) = e.render_args() {
             window.draw_2d(&e, |c, g, _device| {
                 clear([1.0; 4], g);
+                for unit in units {}
                 if is_pressed {
-                    selection_from_points(c, g, first_corner, live_corner);
+                    selection_box(c, g, first_corner, live_corner);
                 }
             });
         }
     }
 }
 
-fn selection_from_points(c: Context, g: &mut G2d, first_corner: [f64; 2], live_corner: [f64; 2]) {
+fn selection_box(c: Context, g: &mut G2d, first_corner: Option<[f64; 2]>, live_corner: Option<[f64; 2]>) {
     if let Some(fc) = first_corner {
         if let Some(lc) = live_corner {
             line(GREEN,
