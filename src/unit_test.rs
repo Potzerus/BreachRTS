@@ -4,6 +4,7 @@ extern crate vecmath;
 
 use piston_window::*;
 use vecmath::vec2_sub;
+use std::cmp::Ordering;
 //use vecmath::*;
 
 const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
@@ -34,7 +35,42 @@ impl Tiles {
 }
 
 struct Unit {
+    selected: bool,
+    position: [f64; 2],
+    size: u64,
+}
 
+impl Unit {
+    fn draw(&self, c: Context, g: &mut G2d) {
+        let color = match self.selected {
+            true => [0.8, 0.8, 0.8, 1.0],
+            false => [1.0, 0.0, 0.0, 1.0],
+        };
+        rectangle(
+            color,
+            [self.position[0] - (self.size as f64) / 2.0, self.position[1] - (self.size as f64) / 2.0, self.size as f64, self.size as f64],
+            c.transform, g);
+    }
+    fn update_selection(&mut self, first_corner: Option<[f64; 2]>, live_corner: Option<[f64; 2]>) {
+        if let Some(fc) = first_corner {
+            if let Some(lc) = live_corner {
+                let x: [f64; 2] = match (&(fc[0] as i32)).cmp(&(lc[0] as i32)) {
+                    Ordering::Less => [fc[0], lc[0]],
+                    Ordering::Equal => [lc[0], fc[0]],
+                    Ordering::Greater => [lc[0], fc[0]],
+                };
+                let y: [f64; 2] = match (&(fc[1] as i32)).cmp(&(lc[1] as i32)) {
+                    Ordering::Less => [fc[1], lc[1]],
+                    Ordering::Equal => [lc[1], fc[1]],
+                    Ordering::Greater => [lc[1], fc[1]],
+                };
+
+                self.selected = {
+                    x[0] <= self.position[0] && self.position[0] <= x[1] && y[0] <= self.position[1] && self.position[1] <= y[1]
+                }
+            }
+        }
+    }
 }
 
 
@@ -54,6 +90,11 @@ fn main() {
     let mut first_corner: Option<[f64; 2]> = None;
     let mut live_corner: Option<[f64; 2]> = None;
     let mut _distance: Option<[f64; 2]> = None;
+    let mut unit_1 = Unit {
+        selected: false,
+        position: [200.0, 200.0],
+        size: 50,
+    };
     while let Some(e) = window.next() {
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
             is_pressed = true;
@@ -77,10 +118,11 @@ fn main() {
         if let Some(_) = e.render_args() {
             window.draw_2d(&e, |c, g, _device| {
                 clear([1.0; 4], g);
-                for unit in units {}
                 if is_pressed {
                     selection_box(c, g, first_corner, live_corner);
+                    unit_1.update_selection(first_corner, live_corner);
                 }
+                unit_1.draw(c, g);
             });
         }
     }
